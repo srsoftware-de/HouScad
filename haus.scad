@@ -81,11 +81,55 @@ module door2(x,neg){
     }    
 }
 
-module roof1(length, width, elevation){    
-    translate([0,-1,elevation])
-        rotate([90,0,90])
-            linear_extrude(height=length)
-                polygon(points=[[0,0],[width+2,0],[1+width/2,width/3]]);        
+// ROOF MODULES
+// roofs are created by intersecting a front profile
+// with a sideward profile ("roofshade").
+// the different shade options are defined next, followed by a switch
+// and an intersection function.
+
+module roofshape1(length,width,height){
+    linear_extrude(height=length)
+        polygon(points=[[-1,0],[width+1,0],[-1+width/2,height]]);        
+}
+
+module roofshape2(length,width,height){
+    delta=height/2;
+    linear_extrude(height=length)
+        polygon(points=[[0,0],[width,0],[width,delta],
+                        [width-delta,height],[delta,height],[0,delta]]);
+}
+
+module roofshape3(length,width,height){
+    delta=height/2;
+    linear_extrude(height=length)
+        polygon(points=[[0,0],[width,0],[width-0.6*delta,delta],
+                        [width-2*delta,height],[2*delta,height],[0.6*delta,delta]]);
+}
+
+
+// roof shade switch
+module roofshape(length,width,height,type){
+    if (type=="r1"){
+        roofshape1(length,width,height);
+    }
+    if (type=="r2"){
+        roofshape2(length,width,height);
+    }
+    if (type=="r3"){
+        roofshape3(length,width,height);
+    }
+}
+
+// intersection of two roof shades
+module roof(length,width,height,elevation,shape){
+    intersection(){
+        translate([0,0,elevation])
+            rotate([90,0,90])
+                roofshape(length,width,height,shape[0]);
+        translate([0,1+width,elevation])
+            rotate([90,0,0])
+                roofshape(width+2,length,height,shape[1]);
+    }
 }
 
 // PART SWITCH
@@ -156,7 +200,7 @@ module story(length,width,config){
 // EXAMPLE: CREATE TWO-Story Building
 // 1st level:
 // 4 walls with a window/door configuration for each
-story(120,70,[["w2","d1","w2","w2","w2"], 
+*story(120,70,[["w2","d1","w2","w2","w2"], 
               ["w3","w3","w3","w3"],
               ["w2","w2","w2","w2","w2"],
               ["w2","w2","w2","w2"]]);
@@ -167,6 +211,7 @@ translate([0,0,30])
             ["w1","w1","w1","w1"],
             ["w1","w1","w1","w1"]]);
 
-// roof
-roof1(100,70,61);
-
+// roof:
+// creates a roof with specified length, width, height and elevation.
+// the combined roof shades are selected by the last parameter
+roof(100,70,30,61,["r1","r3"]);
