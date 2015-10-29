@@ -200,6 +200,28 @@ module story(length,width,config){
         cube([length,width,1]);
 }
 
+// EXAMPLE: CREATE SIMPLE TWO-STORY BUILDING
+module example1(){
+    // 1st level:
+    // 4 walls with a window/door configuration for each
+    story(120,70,[["w2","d1","w2","w2","w2"], 
+              ["w3","w3","w3","w3"],
+              ["w2","w2","w2","w2","w2"],
+              ["w2","w2","w2","w2"]]);
+    // 2nd level:
+    translate([0,0,30])
+        story(100,70,[["w3","w3","w3","w3"],
+            ["w1","w1","d2"],
+            ["w1","w1","w1","w1"],
+            ["w1","w1","w1","w1"]]);
+
+    // roof:
+    // creates a roof with specified length, width, height and elevation.
+    // the combined roof shades are selected by the last parameter
+    roof(100,70,30,61,["r1","r3"]);
+}
+
+// EXAMPLE: CREATE MORE COMPLEX BUILDING
 module example2(){
     
     // 1st floor
@@ -257,4 +279,6 @@ module example2(){
         roof(120,60,35,91,["r1","r0"]);
 }
 
-example2();
+
+example1();
+//example2();
