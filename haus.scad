@@ -109,6 +109,9 @@ module roofshape3(length,width,height){
 
 // roof shade switch
 module roofshape(length,width,height,type){
+    if (type=="r0"){
+        cube([width,height,length]);
+    }
     if (type=="r1"){
         roofshape1(length,width,height);
     }
@@ -118,6 +121,7 @@ module roofshape(length,width,height,type){
     if (type=="r3"){
         roofshape3(length,width,height);
     }
+    
 }
 
 // intersection of two roof shades
@@ -196,22 +200,61 @@ module story(length,width,config){
         cube([length,width,1]);
 }
 
+module example2(){
+    
+    // 1st floor
+    story(120,60,[["w3","d1","w3","w3"], 
+              ["w3","w3"],
+              ["w3","","","","","","",""],
+              ["w3","w3"]]);
 
-// EXAMPLE: CREATE TWO-Story Building
-// 1st level:
-// 4 walls with a window/door configuration for each
-*story(120,70,[["w2","d1","w2","w2","w2"], 
-              ["w3","w3","w3","w3"],
-              ["w2","w2","w2","w2","w2"],
-              ["w2","w2","w2","w2"]]);
-// 2nd level:
-translate([0,0,30])
-    story(100,70,[["w3","w3","w3","w3"],
-            ["w1","w1","d2"],
-            ["w1","w1","w1","w1"],
-            ["w1","w1","w1","w1"]]);
+    translate([10,60,0])
+        story(90,100,[[],["w3","w3","d2","w3","w3"],[],["w3","w3","d2","w3","w3"]]);
 
-// roof:
-// creates a roof with specified length, width, height and elevation.
-// the combined roof shades are selected by the last parameter
-roof(100,70,30,61,["r1","r3"]);
+    translate([0,160,0])
+        story(120,60,[["","","","","","","","w3"], 
+              ["w3","w3"],
+              ["w3","d1","w3","w3","w3"],
+              ["w3","w3"]]);
+    
+    // 2nd floor    
+    translate([0,0,30])
+        story(120,60,[["w3","w3","w3","w3"], 
+              ["w3","w3"],
+              ["w3","","","","","","",""],
+              ["w3","w3"]]);
+
+    translate([10,60,30])
+        story(90,100,[[],["w3","w3","w3","w3","w3"],[],["w3","w3","w3","w3","w3"]]);
+
+    translate([0,160,30])
+        story(120,60,[["","","","","","","","w3"], 
+              ["w3","w3"],
+              ["w3","w3","w3","w3","w3"],
+              ["w3","w3"]]);
+              
+    // 3rd floor    
+    translate([0,0,60])
+        story(120,60,[["w3","w3","w3","w3"], 
+              ["w3","w3"],
+              ["w3","","","","","","",""],
+              ["w3","w3"]]);
+
+    translate([10,60,60])
+        story(90,100,[[],["w3","w3","w3","w3","w3"],[],["w3","w3","w3","w3","w3"]]);
+
+    translate([0,160,60])
+        story(120,60,[["","","","","","","","w3"], 
+              ["w3","w3"],
+              ["w3","w3","w3","w3","w3"],
+              ["w3","w3"]]);
+
+
+    roof(120,60,35,91,["r1","r0"]);
+    translate([10,30])
+        roof(90,160,30,91,["r0","r1"]);
+    translate([0,160,0])
+        roof(120,60,35,91,["r1","r0"]);
+}
+
+example2();
