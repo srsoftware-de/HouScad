@@ -8,6 +8,9 @@
 // WINDOW MODULES
 // can be added here:
 
+//         _
+// simple | |
+//        |_|
 module window1(x,neg){
     w=10;
     h=15;
@@ -19,6 +22,10 @@ module window1(x,neg){
     }    
 }
 
+//   ___
+//  |___|
+//  | | |
+//  |_|_| 
 module window2(x,neg){
     w=12;
     h=15;
@@ -32,6 +39,10 @@ module window2(x,neg){
     }    
 }
 
+//  .-.
+// |___|
+// |   |
+// |___|
 module window3(x,neg){
     w=12;
     h=15;
@@ -60,6 +71,10 @@ module window3(x,neg){
 // DOOR MODULES
 // can be added here
 
+
+//  _
+// | |
+// | |
 module door1(x,neg){
     w=10;
     h=20;
@@ -70,6 +85,9 @@ module door1(x,neg){
     }    
 }
 
+//  ___
+// | | |
+// | | |
 module door2(x,neg){
     w=18;
     h=20;
@@ -87,11 +105,14 @@ module door2(x,neg){
 // the different shade options are defined next, followed by a switch
 // and an intersection function.
 
+//   /\ 
 module roofshape1(length,width,height){
     linear_extrude(height=length)
         polygon(points=[[-1,0],[width+1,0],[-1+width/2,height]]);        
 }
 
+//   __
+//  /  \     
 module roofshape2(length,width,height){
     delta=height/2;
     linear_extrude(height=length)
@@ -99,6 +120,8 @@ module roofshape2(length,width,height){
                         [width-delta,height],[delta,height],[0,delta]]);
 }
 
+//  .---.
+// /     \ 
 module roofshape3(length,width,height){
     delta=height/2;
     linear_extrude(height=length)
