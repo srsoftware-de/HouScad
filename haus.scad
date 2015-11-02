@@ -157,7 +157,7 @@ module door3(x,neg){
 //   /\ 
 module roofshape1(length,width,height){
     linear_extrude(height=length)
-        polygon(points=[[-1,0],[width+1,0],[-1+width/2,height]]);        
+        polygon(points=[[0,0],[width,0],[width/2,height]]);        
 }
 
 //   __
@@ -202,9 +202,9 @@ module roof(length,width,height,elevation,shape){
         translate([0,0,elevation])
             rotate([90,0,90])
                 roofshape(length,width,height,shape[0]);
-        translate([0,1+width,elevation])
+        translate([0,width,elevation])
             rotate([90,0,0])
-                roofshape(width+2,length,height,shape[1]);
+                roofshape(width,length,height,shape[1]);
     }
 }
 
@@ -306,7 +306,7 @@ module example2(){
               ["w3","w3"]]);
 
     translate([10,60,0])
-        story(90,100,[[],["w3","w3","d2","w3","w3"],[],["w3","w3","d2","w3","w3"]]);
+        story(90,100,[[],["w3","w3","d3","w3","w3"],[],["w3","w3","d3","w3","w3"]]);
 
     translate([0,160,0])
         story(120,60,[["","","","","","","","w3"], 
@@ -347,16 +347,17 @@ module example2(){
               ["w3","w3"]]);
 
 
-    roof(120,60,35,91,["r1","r0"]);
-    translate([10,30])
-        roof(90,160,30,91,["r0","r1"]);
-    translate([0,160,0])
-        roof(120,60,35,91,["r1","r0"]);
+    translate([0,-1,0])
+        roof(120,62,35,91,["r1","r0"]);
+    translate([9,30])
+        roof(92,160,30,91,["r0","r1"]);
+    translate([0,159,0])
+        roof(120,62,35,91,["r1","r0"]);
 }
 
 
 
 
-example1();
-//example2();
+//example1();
+example2();
 
