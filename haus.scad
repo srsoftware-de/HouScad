@@ -99,6 +99,31 @@ module door2(x,neg){
     }    
 }
 
+module door3(x,neg){
+    w=18;
+    h=20;
+    if (neg){
+        translate([x,2,h])
+            rotate([90,0,0]){
+                translate([-0.5,0,0])
+                    pie(w/2-1.5,180,60,4);
+                translate([0,0.5,0])
+                    pie(w/2-1.5,240,60,4);
+                translate([0.5,0,0])
+                    pie(w/2-1.5,300,60,4);
+            }
+        translate([1+x-w/2,-2,0]) cube([w/2-1.5,2,h-1]);
+        translate([0.5+x,-2,0]) cube([w/2-1.5,2,h-1]);
+
+    } else {
+        translate([x-w/2,-1,0])
+            cube([w,2,h]);     
+        translate([x,1,h])
+                rotate([90,0,0])
+                    cylinder(h=2,d=w);        
+    }    
+}
+
 // ROOF MODULES
 // roofs are created by intersecting a front profile
 // with a sideward profile ("roofshade").
@@ -179,6 +204,9 @@ module part(x,type,sub){
     if (type=="d2"){
         door2(x,sub);
     }
+    if (type=="d3"){
+        door3(x,sub);
+    }
 }
 
 // CREATE A WALL.
@@ -227,7 +255,7 @@ module story(length,width,config){
 module example1(){
     // 1st level:
     // 4 walls with a window/door configuration for each
-    story(120,70,[["w2","d1","w2","w2","w2"], 
+    story(120,70,[["w2","d3","w2","w2","w2"], 
               ["w3","w3","w3","w3"],
               ["w2","w2","w2","w2","w2"],
               ["w2","w2","w2","w2"]]);
@@ -303,5 +331,31 @@ module example2(){
 }
 
 
+module pie(r = 10, a1 = 0, a2 = 30, h = 10){
+    rotate([0,0,360-a1])
+        linear_extrude(h)
+            slice(r,a2);
+}
+
+module slice(r = 10, deg = 30) {
+
+    degn = (deg % 360 > 0) ? deg % 360 : deg % 360 + 360;    
+    difference() {
+        circle(r);
+        if (degn > 180) {
+            intersection_for(a = [0, 180 - degn]) {
+                rotate(a) translate([-r, 0, 0]) square(r * 2);
+            }
+        } else {
+            union() for(a = [0, 180 - degn]) {
+                rotate(a) translate([-r, 0, 0]) square(r * 2);
+            }
+        }
+
+}
+
+}
+
 example1();
 //example2();
+
