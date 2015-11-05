@@ -4,9 +4,14 @@
 //
 // AUTHOR: STEPHAN RICHTER
 
+wall_thickness=5; 
 
-wall_thickness=5;
-
+// comment some of the following lines to not render respective parts
+front=true; // render front wall
+right=true; // render right wall
+left=true; // render left wall
+back=true; // render back wall
+ceilings=true; // render ceilings
 
 // HELPER FUNCTIONS
 module pie(r = 10, a1 = 0, a2 = 30, h = 10){
@@ -167,18 +172,18 @@ module door3(x,neg){
     hw=width/2; // half width
     lh=height-hw; // lower part height
     depth=2+frame_width+wall_thickness;
-    df=3*frame_width/2;
+    q=3*frame_width/2;
     lw=(width-3*frame_width)/2;
     t=-(frame_width+1);
     if (neg){
       translate([x,t+depth,lh])
             rotate([90,0,0]){
                 translate([-0.5,0,0])
-		pie(hw-df,180,60,depth);
+		pie(hw-q,180,60,depth);
                 translate([0,0.5,0])
-		pie(hw-df,240,60,depth);
+		pie(hw-q,240,60,depth);
                 translate([0.5,0,0])
-		pie(hw-df,300,60,depth);
+		pie(hw-q,300,60,depth);
             }
             translate([x-hw+frame_width,t,0]) cube([lw,depth,lh-frame_width]);
 	    translate([x+frame_width/2,t,0]) cube([lw,depth,lh-frame_width]);
@@ -192,24 +197,33 @@ module door3(x,neg){
 }
 
 module door4(x,neg){
-  w=18;
-  h1=20;
-  h2=5;
+  // adjustables
+  width=18;
+  h1=18; // lower height
+  h2=7; // upper height
+  frame_width = 1;
+    
+  // helpers, do not modify
+  hw=width/2; // half width
+  df=2*frame_width; // double frame_width
+  depth=2+frame_width+wall_thickness;
+  t=-(frame_width+1);
+  q=3*frame_width/2;
   if (neg){
     difference(){
-      translate([1+x-w/2,-2,0]) cube([w/2-1.5,2,h1]);
-      translate([1.5+x-w/2,-0.5,1]) cube([w/2-2.5,2,(h1-3)/2]);
-      translate([1.5+x-w/2,-0.5,0.5+h1/2]) cube([w/2-2.5,2,(h1-3)/2]);
+      translate([x-hw+frame_width,-df,0]) cube([hw-q,df,h1]);
+      translate([x-hw+q,-0.5,frame_width]) cube([hw-q-frame_width,2,h1/2-q]);
+      translate([x-hw+q,-0.5,(frame_width+h1)/2]) cube([hw-q-frame_width,2,h1/2-q]);
     }
     difference(){
-      translate([0.5+x,-2,0]) cube([w/2-1.5,2,h1]);
-      translate([1+x,-0.5,1]) cube([w/2-2.5,2,(h1-3)/2]);
-      translate([1+x,-0.5,0.5+h1/2]) cube([w/2-2.5,2,(h1-3)/2]);
+      translate([0.5+x,-df,0]) cube([hw-q,df,h1]);
+      translate([1+x,-0.5,frame_width]) cube([hw-q-frame_width,2,h1/2-q]);
+      translate([1+x,-0.5,(frame_width+h1)/2]) cube([hw-q-frame_width,2,h1/2-q]);
     }
-    translate([1+x-w/2,-2,h1+1]) cube([w-2,5,h2]);
+    translate([x-hw+frame_width,t,h1+frame_width]) cube([width-df,depth,h2-df]);
   } else {
-    translate([x-w/2,-1,0])
-    cube([w,2,h1+h2+2]);     
+    translate([x-hw,-frame_width,0])
+      cube([width,frame_width,h1+h2]);     
   }    
 }
 
@@ -217,16 +231,28 @@ module door4(x,neg){
 // |()|0|
 // |  | |
 module door5(x,neg){
-  w=18;
-  h=20;
-  h2=5;
+  // adjustables
+  width=18;
+  heigth=20;
+  win_h=6; // window height
+  frame_width=1;
+  
+  // helpers, do not modify
+  df=2*frame_width; // double frame
+  hw=width/2; // half width
+  tw=width/3-frame_width; // third width
+  q=3*frame_width/2;
+  depth=2+frame_width+wall_thickness;
+  t=-(frame_width+1);
   if (neg){
-    translate([1+x-w/2,-2,0]) cube([2*w/3-1.5,2,h-1]);
-    translate([0.5+x+w/6,-2,0]) cube([w/3-1.5,2,h-1]);
-    translate([1.5+x-w/2,-2,h-h2-1.5]) cube([2*w/3-2.5,5,h2]);
-    translate([1+x+w/6,-2,h-h2-1.5]) cube([w/3-2.5,5,h2]);    
+    translate([x-hw+frame_width,-df,0]) cube([2*tw,df,heigth-frame_width]);
+    translate([x-hw+2*tw+df,-df,0]) cube([tw,df,heigth-frame_width]);
+    
+    // windows
+    translate([x-hw+q,t,heigth-win_h-q]) cube([2*tw-frame_width,depth,win_h]);
+    translate([x-hw+2*tw+frame_width+q,t,heigth-win_h-q]) cube([tw-frame_width,depth,win_h]);    
   } else {
-    translate([x-w/2,-1,0]) cube([w,2,h]);
+    translate([x-hw,-frame_width,0]) cube([width,frame_width,heigth]);
   }    
 }
 
@@ -348,15 +374,25 @@ module wall(length, height, config){
 // CREATE A STORY/LEVEL/FLOOR
 // see example below
 module story(length,width,height,config){
-  wall(length,height,config[0]);
-  translate([length,0,0]) rotate([0,00,90])
-    wall(width,height,config[1]);
-  translate([length,width,0]) rotate([0,0,180])
-    wall(length,height,config[2]);
-  translate([0,width,0]) rotate([0,00,270])
-    wall(width,height,config[3]);
-  translate([0,0,height])
-    cube([length,width,1]);
+  if (front){
+    wall(length,height,config[0]);
+  }
+  if (right){
+    translate([length,0,0]) rotate([0,00,90])
+      wall(width,height,config[1]);
+  }
+  if (back){
+    translate([length,width,0]) rotate([0,0,180])
+      wall(length,height,config[2]);
+  }
+  if (left){
+    translate([0,width,0]) rotate([0,00,270])
+      wall(width,height,config[3]);
+  }
+  if (ceilings){
+    translate([0,0,height])
+      cube([length,width,1]);
+  }
 }
 
 module ledge_part(length,height){
@@ -383,7 +419,7 @@ module ledge(length,width,height=2){
 module example1(){
     // 1st level:
     // 4 walls with a window/door configuration for each
-    story(120,70,30,[["w1","d3","w1","d1","w1"], 
+    story(120,70,30,[["w1","d3","w1","d5","w1"], 
               ["w3","w3","w3","w3"],
               ["w2","w2","w2","w2","w2"],
               ["w2","w2","w2","w2"]]);
@@ -452,7 +488,5 @@ module example2(){
 example1();
 //example2();
 
-//window3(10,false);
-//window3(10,true);
 
 
