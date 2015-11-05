@@ -39,13 +39,14 @@ module slice(r = 10, deg = 30) {
 // simple | |
 //        |_|
 module window1(x,neg){
-    w=10;
-    h=15;
-    o=5;      
+    width=10; // outer width
+    height=15; // outer height
+    frame_width=1; 
+    elevation=5;      
     if (neg){
-        translate([1+x-w/2,-2,o+1]) cube([w-2,4,h-2]);
+      translate([x-width/2+frame_width,-(1+frame_width),elevation+1]) cube([width-2*frame_width,2+frame_width+wall_thickness,height-2]);
     } else {
-        translate([x-w/2,-1,o]) cube([w,2,h]);
+      translate([x-width/2,-frame_width,elevation]) cube([width,frame_width,height]);
     }    
 }
 
@@ -54,15 +55,29 @@ module window1(x,neg){
 //  | | |
 //  |_|_| 
 module window2(x,neg){
-    w=12;
-    h=15;
-    o=5;      
+    // adjustables
+    width=12; // outer width
+    height=17; // outer height
+    elevation=5;
+    frame_width=1;
+    
+    // calculated helpers. do noth change these
+    uh=height/3-frame_width; // height of upper window part
+    lh=2*uh; // height of lower window part
+    lw=(width-3*frame_width)/2; // inner width of lower part
+    depth=2+frame_width+wall_thickness;
+    t=-(1+frame_width);
+    
+    // drawing
     if (neg){
-        translate([1+x-w/2,-2,o+1]) cube([w/2-1.5,4,2*h/3-0.5]);
-        translate([0.5+x,-2,o+1]) cube([w/2-1.5,4,2*h/3-0.5]);
-        translate([1+x-w/2,-2,o+2*h/3+1.5]) cube([w-2,4,h/3-0.5]);        
+      translate([x-width/2+frame_width,t,elevation+frame_width])
+	cube([lw,depth,lh]);
+      translate([x+frame_width/2,t,elevation+frame_width])
+	cube([lw,depth,lh]);
+      translate([x-width/2+frame_width,t,elevation+lh+2*frame_width])
+	cube([width-2*frame_width,depth,uh]);        
     } else {
-        translate([x-w/2,-1,o]) cube([w,2,h+2]);
+      translate([x-width/2,-frame_width,elevation]) cube([width,frame_width,height]);
     }    
 }
 
@@ -71,26 +86,27 @@ module window2(x,neg){
 // |   |
 // |___|
 module window3(x,neg){
-    w=12;
-    h=15;
-    o=5; 
-    if (neg){
-        translate([x-w/2+1,-2,5]){
-            cube([w-2,4,h]);
-            difference(){
-                translate([w/2-1,0,h])
-                    rotate([-90,0,0])
-                        cylinder(d=w-2,h=4);            
-                cube([w-2,4,h+1]);                
-                
-            }
-        }
+    width=12; // outer width
+    height=22;  // outer height
+    elevation=5;
+    frame_width=0.5;
+    
+    // helpers, do not modify
+    t=-(1+frame_width);
+    df=2*frame_width; // double frame
+    wh=width/2;
+    depth=2+frame_width+wall_thickness;
+    lh=height-wh; // lower height
+    if (neg){      
+      translate([x,t,elevation+lh]) rotate([270,0,0])
+	pie(wh-frame_width,0,180,depth); 
+      translate([x+frame_width-wh,t,elevation+frame_width])
+	cube([width-df,depth,lh-df]);
     } else {
-        translate([x-w/2,-1,4]){
-            cube([w,2,h+1]);
-            translate([w/2,0,h+1])
-                rotate([-90,0,0])
-                    cylinder(d=w,h=2);     
+      translate([x-wh,-frame_width,elevation]){
+	cube([width,frame_width,lh]);
+	translate([wh,0,lh]) rotate([-90,0,0])
+	  cylinder(d=width,h=frame_width);     
         }
     }
 }
@@ -103,12 +119,16 @@ module window3(x,neg){
 // | |
 // | |
 module door1(x,neg){
-    w=10;
-    h=20;
+    width=10;
+    height=20;
+    frame_width=1;
+    
+    // helper, do not modify
+    df=2*frame_width;
     if (neg){
-        translate([1+x-w/2,-2,0]) cube([w-2,2,h-1]);
+      translate([x-width/2+frame_width,-df,0]) cube([width-df,df,height-frame_width]);
     } else {
-        translate([x-w/2,-1,0]) cube([w,2,h]);
+      translate([x-width/2,-1,0]) cube([width,frame_width,height]);
     }    
 }
 
@@ -116,13 +136,19 @@ module door1(x,neg){
 // | | |
 // | | |
 module door2(x,neg){
-    w=18;
-    h=20;
+    // adjustables
+    width=18; // outer width
+    height=20; // outer height
+    frame_width=1; 
+    
+    // helpers, do not modify
+    hw=width/2; // half width
+    df=frame_width*2; // double frame width
     if (neg){
-        translate([1+x-w/2,-2,0]) cube([w/2-1.5,2,h-1]);
-        translate([0.5+x,-2,0]) cube([w/2-1.5,2,h-1]);
+      translate([x-hw+frame_width,-df,0]) cube([hw-3/2*frame_width,df,height-frame_width]);
+      translate([x+frame_width/2,-df,0]) cube([hw-3/2*frame_width,df,height-frame_width]);
     } else {
-        translate([x-w/2,-1,0]) cube([w,2,h]);
+      translate([x-hw,-frame_width,0]) cube([width,frame_width,height]);
     }    
 }
 
@@ -132,27 +158,36 @@ module door2(x,neg){
 //  |_|_|
 //  
 module door3(x,neg){
-    w=18;
-    h=20;
+    // adjustables
+    width=18; // outer width
+    height=29; // outer heigth
+    frame_width=1;
+
+    // helpers, do not modify
+    hw=width/2; // half width
+    lh=height-hw; // lower part height
+    depth=2+frame_width+wall_thickness;
+    df=3*frame_width/2;
+    lw=(width-3*frame_width)/2;
+    t=-(frame_width+1);
     if (neg){
-        translate([x,2,h])
+      translate([x,t+depth,lh])
             rotate([90,0,0]){
                 translate([-0.5,0,0])
-                    pie(w/2-1.5,180,60,4);
+		pie(hw-df,180,60,depth);
                 translate([0,0.5,0])
-                    pie(w/2-1.5,240,60,4);
+		pie(hw-df,240,60,depth);
                 translate([0.5,0,0])
-                    pie(w/2-1.5,300,60,4);
+		pie(hw-df,300,60,depth);
             }
-        translate([1+x-w/2,-2,0]) cube([w/2-1.5,2,h-1]);
-        translate([0.5+x,-2,0]) cube([w/2-1.5,2,h-1]);
+            translate([x-hw+frame_width,t,0]) cube([lw,depth,lh-frame_width]);
+	    translate([x+frame_width/2,t,0]) cube([lw,depth,lh-frame_width]);
 
     } else {
-        translate([x-w/2,-1,0])
-            cube([w,2,h]);     
-        translate([x,1,h])
-                rotate([90,0,0])
-                    cylinder(h=2,d=w);        
+      translate([x-hw,-frame_width,0])
+	  cube([width,frame_width,lh]);     
+      translate([x,0,lh]) rotate([90,0,0])
+		cylinder(h=frame_width,d=width);        
     }    
 }
 
@@ -348,7 +383,7 @@ module ledge(length,width,height=2){
 module example1(){
     // 1st level:
     // 4 walls with a window/door configuration for each
-    story(120,70,30,[["w2","d3","w2","w2","w2"], 
+    story(120,70,30,[["w1","d3","w1","d1","w1"], 
               ["w3","w3","w3","w3"],
               ["w2","w2","w2","w2","w2"],
               ["w2","w2","w2","w2"]]);
@@ -414,8 +449,10 @@ module example2(){
         roof(120,57,35,["r1","r0"]); //*/
 }
 
-//example1();
+example1();
 //example2();
 
-story(120,90,30,[]);
+//window3(10,false);
+//window3(10,true);
+
 
