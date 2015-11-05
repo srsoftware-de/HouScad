@@ -5,6 +5,9 @@
 // AUTHOR: STEPHAN RICHTER
 
 
+wall_thickness=5;
+
+
 // HELPER FUNCTIONS
 module pie(r = 10, a1 = 0, a2 = 30, h = 10){
     rotate([0,0,360-a1])
@@ -295,8 +298,8 @@ module wall(length, height, config){
             linear_extrude(height=height)
                 polygon(points=[[0,0],
                                 [length,0],
-                                [length-1,1],
-                                [1,1]  ]);    
+                                [length-wall_thickness,wall_thickness],
+			[wall_thickness,wall_thickness]  ]);    
             for (i=[1:1:1+size]){
                 part(i*dx,config[i-1]);
             }
@@ -309,40 +312,49 @@ module wall(length, height, config){
 
 // CREATE A STORY/LEVEL/FLOOR
 // see example below
-module story(length,width,config){
-    wall(length,30,config[0]);
-    translate([length,0,0]) 
-        rotate([0,00,90])
-            wall(width,30,config[1]);
-    translate([length,width,0])
-        rotate([0,0,180])
-            wall(length,30,config[2]);
-    translate([0,width,0])  
-        rotate([0,00,270])
-            wall(width,30,config[3]);
-    translate([0,0,30])
-        cube([length,width,1]);
+module story(length,width,height,config){
+  wall(length,height,config[0]);
+  translate([length,0,0]) rotate([0,00,90])
+    wall(width,height,config[1]);
+  translate([length,width,0]) rotate([0,0,180])
+    wall(length,height,config[2]);
+  translate([0,width,0]) rotate([0,00,270])
+    wall(width,height,config[3]);
+  translate([0,0,height])
+    cube([length,width,1]);
 }
 
-module ledge(length, width,d=2){
-    hull(){
-        cube([length,width,0.01]);
-        translate([-d/2,-d/2,d/2])
-            cube([length+d,width+d,d/2]);
-    }
+module ledge_part(length,height){
+  d=2;
+  hull(){
+    linear_extrude(height=0.01) 
+    polygon([[d,d],[length-d,d],[length,0],[0,0]]);
+    translate([0,0,height]) linear_extrude(height=0.01)
+      polygon([[d,d],[length-d,d],[length+height,-height],[-height,-height]]);
+  }
+}
+
+module ledge(length,width,height=2){
+  ledge_part(length,height);
+  translate([length,0,0])rotate([0,0,90])
+  ledge_part(width,height);
+  translate([length,width,0])rotate([0,0,180])    
+  ledge_part(length,height);
+  translate([0,width,0])rotate([0,0,270])
+  ledge_part(width,height);
 }
 
 // EXAMPLE: CREATE SIMPLE TWO-STORY BUILDING
 module example1(){
     // 1st level:
     // 4 walls with a window/door configuration for each
-    story(120,70,[["w2","d3","w2","w2","w2"], 
+    story(120,70,30,[["w2","d3","w2","w2","w2"], 
               ["w3","w3","w3","w3"],
               ["w2","w2","w2","w2","w2"],
               ["w2","w2","w2","w2"]]);
     // 2nd level:
     translate([0,0,30]){
-            story(100,70,[["w3","w3","w3","w3"],
+            story(100,70,30,[["w3","w3","w3","w3"],
                           ["w1","w1","d2"],
                           ["w1","w1","w1","w1"],
                           ["w1","w1","w1","w1"]]);
@@ -358,58 +370,40 @@ module example1(){
 module example2(){
     
     // 1st floor
-    story(120,55,[["w2","d1","w2","w2"], 
-              ["w2","w2"],
-              ["w2","","","","","","",""],
-              ["w2","w2"]]);
+    story(120,55,30,[["w2","d1","w2","w2"], ["w2","w2"], ["w2","","","","","","",""], ["w2","w2"]]);
 
     translate([10,55,0])
-        story(90,100,[[],["w2","w2","d3","w2","w2"],[],["w2","w2","d3","w2","w2"]]);
+        story(90,100,30,[[],["w2","w2","d3","w2","w2"],[],["w2","w2","d3","w2","w2"]]);
 
     translate([0,155,0])
-        story(120,55,[["","","","","","","","w2"], 
-              ["w2","w2"],
-              ["w2","d1","w2","w2","w2"],
-              ["w2","w2"]]);
+	story(120,55,30,[["","","","","","","","w2"], ["w2","w2"], ["w2","d1","w2","w2","w2"], ["w2","w2"]]);
     
     // 2nd floor    
     translate([0,0,30])
-        story(120,55,[["w2","w2","w2","w2"], 
-              ["w2","w2"],
-              ["w2","","","","","","",""],
-              ["w2","w2"]]);
+	story(120,55,30,[["w2","w2","w2","w2"], ["w2","w2"], ["w2","","","","","","",""], ["w2","w2"]]);
 
     translate([10,55,30])
-        story(90,100,[[],["w2","w2","w2","w2","w2"],[],["w2","w2","w2","w2","w2"]]);
+	story(90,100,30,[[],["w2","w2","w2","w2","w2"],[],["w2","w2","w2","w2","w2"]]);
 
     translate([0,155,30])
-        story(120,55,[["","","","","","","","w2"], 
-              ["w2","w2"],
-              ["w2","w2","w2","w2","w2"],
-              ["w2","w2"]]);
+	story(120,55,30,[["","","","","","","","w2"], ["w2","w2"], ["w2","w2","w2","w2","w2"], ["w2","w2"]]);
               
     translate([0,0,60])
         ledge(120,55,2);
     translate([10,55,60])
-        ledge(90,100);
+        ledge(90,100,2);
     translate([0,155,60])
         ledge(120,55,2);
         
     // 3rd floor    
     translate([0,0,62])
-        story(120,55,[["w3","w3","w3","w3"], 
-              ["w3","w3"],
-              ["w3","","","","","","",""],
-              ["w3","w3"]]);
+	story(120,55,30,[["w3","w3","w3","w3"], ["w3","w3"], ["w3","","","","","","",""], ["w3","w3"]]);
 
     translate([10,55,62])
-        story(90,100,[[],["w3","w3","w3","w3","w3"],[],["w3","w3","w3","w3","w3"]]);
+	story(90,100,30,[[],["w3","w3","w3","w3","w3"],[],["w3","w3","w3","w3","w3"]]);
 
     translate([0,155,62])
-        story(120,55,[["","","","","","","","w3"], 
-              ["w3","w3"],
-              ["w3","w3","w3","w3","w3"],
-              ["w3","w3"]]);
+	story(120,55,30,[["","","","","","","","w3"], ["w3","w3"], ["w3","w3","w3","w3","w3"], ["w3","w3"]]);
 
     // roof parts
     translate([0,-1,93])
@@ -421,6 +415,7 @@ module example2(){
 }
 
 //example1();
-example2();
+//example2();
 
+story(120,90,30,[]);
 
